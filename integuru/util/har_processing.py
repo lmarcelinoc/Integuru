@@ -38,10 +38,40 @@ excluded_header_keywords = (
     "plausible",
 )
 
+sensitive_keywords = (
+    "Authorization",
+    "Token",
+    "Auth",
+    "Password",
+    "Secret",
+    "Key",
+    "Credential",
+    "Session",
+    "Bearer",
+)
+
+def filter_sensitive_info(request: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Filters out sensitive information from the request headers and body.
+    """
+    filtered_headers = {
+        k: v for k, v in request.get("headers", {}).items()
+        if not any(keyword.lower() in k.lower() for keyword in sensitive_keywords)
+    }
+    request["headers"] = filtered_headers
+
+    if "postData" in request:
+        post_data = request["postData"].get("text", "")
+        if any(keyword.lower() in post_data.lower() for keyword in sensitive_keywords):
+            request["postData"]["text"] = "[FILTERED]"
+
+    return request
+
 def format_request(har_request: Dict[str, Any]) -> Request:
     """
     Formats a HAR request into a Request object.
     """
+    har_request = filter_sensitive_info(har_request)
     method = har_request.get("method", "GET")
     url = har_request.get("url", "")
 

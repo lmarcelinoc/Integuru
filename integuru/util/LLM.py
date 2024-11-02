@@ -4,9 +4,13 @@ class LLMSingleton:
     _instance = None
     _default_model = "gpt-4o"  
     _alternate_model = "o1-preview"
+    _local_model = None
 
     @classmethod
-    def get_instance(cls, model: str = None):
+    def get_instance(cls, model: str = None, use_local: bool = False):
+        if use_local and cls._local_model:
+            return cls._local_model
+
         if model is None:
             model = cls._default_model
             
@@ -34,5 +38,9 @@ class LLMSingleton:
 
         return cls._instance
 
-llm = LLMSingleton()
+    @classmethod
+    def set_local_model(cls, local_model_instance):
+        """Set a local model instance to use instead of OpenAI"""
+        cls._local_model = local_model_instance
 
+llm = LLMSingleton()
