@@ -39,8 +39,14 @@ if __name__ == "__main__":
         default=False,
         help="Whether to generate the full integration code",
     )
+    @click.option(
+        "--use-local-llm",
+        is_flag=True,
+        default=False,
+        help="Whether to use a local LLM instead of sending data to OpenAI",
+    )
     def cli(
-        model, prompt, har_path, cookie_path, max_steps, input_variables, generate_code
+        model, prompt, har_path, cookie_path, max_steps, input_variables, generate_code, use_local_llm
     ):
         input_vars = dict(input_variables)
         asyncio.run(
@@ -52,6 +58,7 @@ if __name__ == "__main__":
                 input_variables=input_vars,
                 max_steps=max_steps,
                 to_generate_code=generate_code,
+                use_local_llm=use_local_llm,
             )
         )
 
